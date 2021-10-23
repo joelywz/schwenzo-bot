@@ -1,0 +1,33 @@
+{
+  "name": "schwenzo-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy-commands:global": "ts-node ./src/utils/deploy-commands.ts global",
+    "deploy-commands": "ts-node ./src/utils/deploy-commands.ts",
+    "dev": "nodemon ./src/main.ts",
+    "start": "prisma migrate deploy && node ./dist/main",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@prisma/client": "^3.3.0",
+    "axios": "^0.23.0",
+    "cross-env": "^7.0.3",
+    "discord-api-types": "^0.24.0",
+    "discord.js": "^13.2.0",
+    "dotenv": "^10.0.0",
+    "jimp": "^0.16.1",
+    "node-binance-api": "^0.13.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.1"
+  }
+}

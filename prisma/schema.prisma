@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model MarketMonitor {
+  guildId    String      @id @unique
+  channelId  String      @unique
+  messageId  String      @unique
+  livePrices LivePrice[]
+}
+
+model LivePrice {
+  symbol        String
+  guildId       String
+  marketMonitor MarketMonitor @relation(fields: [guildId], references: [guildId])
+
+  @@unique([symbol, guildId])
+}
+
+model LinkedImage {
+  id      String @id @unique @default(uuid())
+  guildId String
+  message String
+  path    String @unique
+
+  @@unique([guildId, message])
+}
