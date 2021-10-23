@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "deploy-commands:global": "ts-node ./src/utils/deploy-commands.ts global",
     "deploy-commands": "ts-node ./src/utils/deploy-commands.ts",
-    "dev": "nodemon ./src/main.ts",
+    "deploy-commands:global": "ts-node ./src/utils/deploy-commands.ts global",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/main.ts",
     "start": "prisma migrate deploy && node ./dist/main",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
