@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { SchwenzoClient } from '../SchwenzoBot';
+import { SchwenzoClient } from './SchwenzoBot';
 
 export default abstract class Component {
   client: SchwenzoClient;

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
 import PriceEntity from '../components/PriceEntity';
-import SchwenzoCommand from '../SchwenzoCommand';
+import SchwenzoCommand from '../core/SchwenzoCommand';
 import CacheManager from '../utils/cache-manager/CacheManager';
 
 export default class Price implements SchwenzoCommand {

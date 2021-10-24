@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import SchwenzoCommand from '../SchwenzoCommand';
-import { SchwenzoClient } from '../SchwenzoBot';
+import SchwenzoCommand from '../core/SchwenzoCommand';
+import { SchwenzoClient } from '../core/SchwenzoBot';
 import ImageLinkComponent from '../components/ImageLink';
 
 export default class ImageLink implements SchwenzoCommand {

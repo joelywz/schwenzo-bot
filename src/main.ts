@@ -1,7 +1,7 @@
 import ImageBlob from './components/ImageBlob';
 import ImageLink from './components/ImageLink';
 import MarketMonitor from './components/MarketMonitor/MarketMonitor';
-import SchwenzoBot from './SchwenzoBot';
+import SchwenzoBot from './core/SchwenzoBot';
 
 const DATABASE_URL = process.env['DATABASE_URL'] || null;
 if (!DATABASE_URL) throw 'DATABASE_URL not found.';

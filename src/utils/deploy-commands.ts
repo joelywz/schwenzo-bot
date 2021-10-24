@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import SchwenzoCommand from '../SchwenzoCommand';
+import SchwenzoCommand from '../core/SchwenzoCommand';
 import dotenv from 'dotenv';
 
 importEnv();

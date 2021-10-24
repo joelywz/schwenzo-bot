@@ -3,10 +3,9 @@ import { Client, Intents, Interaction, Message } from 'discord.js';
 import SchwenzoCommand from './SchwenzoCommand';
 import path from 'path';
 import fs from 'fs';
-import SchwenzoError from './utils/SchwenzoError';
+import SchwenzoError from '../utils/SchwenzoError';
 import { PrismaClient } from '.prisma/client';
-import ImageBlob from './components/ImageBlob';
-import Component from './components/Component';
+import Component from './Component';
 
 export interface SchwenzoClient extends Client {
   commands: Collection<string, SchwenzoCommand>;
@@ -28,18 +27,14 @@ export default class SchwenzoBot {
       this.resolveLoading = resolve;
     });
     this.client = new Client({ intents }) as SchwenzoClient;
-    // Init database
     this.client.prisma = new PrismaClient();
-    // Bind client event to class functions
     this.client.getComponent = this.getComponent.bind(this);
     this.client.once('ready', this.onReady.bind(this));
     this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
     this.client.on('messageCreate', this.onMessageCreate.bind(this));
     this.client.on('error', this.onError.bind(this));
-    // Commands Import
     this.client.commands = new Collection();
     this.importCommands();
-    // Start Bot
     this.client.login(token);
   }
 
@@ -102,12 +97,12 @@ export default class SchwenzoBot {
   private async importCommands() {
     // Get all the file names in commands folder
     const commandFiles = fs
-      .readdirSync(path.join(__dirname, 'commands'))
+      .readdirSync(path.join(__dirname, '../commands'))
       .filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
 
     // Register commands to the client
     for (const file of commandFiles) {
-      const i = await import(`./commands/${file}`);
+      const i = await import(`../commands/${file}`);
       const command = new i.default() as SchwenzoCommand;
       console.info(`Importing command "${command.data.name}"`);
       this.client.commands.set(command.data.name, command);

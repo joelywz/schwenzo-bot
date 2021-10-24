@@ -1,8 +1,8 @@
 import Jimp, { MIME_PNG } from 'jimp';
-import { SchwenzoClient } from '../../SchwenzoBot';
+import { SchwenzoClient } from '../../core/SchwenzoBot';
 import { Message } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
-import Component from '../Component';
+import Component from '../../core/Component';
 import ImageBlob from '../ImageBlob';
 
 class Link {

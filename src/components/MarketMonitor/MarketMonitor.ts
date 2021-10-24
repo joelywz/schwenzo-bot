@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { Client, Message, MessageEmbed } from 'discord.js';
 import Binance from 'node-binance-api';
-import { SchwenzoClient } from '../../SchwenzoBot';
+import { SchwenzoClient } from '../../core/SchwenzoBot';
 import { marketDoesExist } from '../../utils/binance-api';
 import SchwenzoError from '../../utils/SchwenzoError';
-import Component from '../Component';
+import Component from '../../core/Component';
 import LivePrice from './LivePrice';
 
 export enum MarketMonitorError {

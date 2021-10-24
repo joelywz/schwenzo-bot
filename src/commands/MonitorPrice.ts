@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, Interaction, MessageEmbed } from 'discord.js';
 import MarketMonitor from '../components/MarketMonitor/MarketMonitor';
-import { SchwenzoClient } from '../SchwenzoBot';
-import SchwenzoCommand from '../SchwenzoCommand';
+import { SchwenzoClient } from '../core/SchwenzoBot';
+import SchwenzoCommand from '../core/SchwenzoCommand';
 
 export default class Ping implements SchwenzoCommand {
   marketMonitor: MarketMonitor | null = null;
