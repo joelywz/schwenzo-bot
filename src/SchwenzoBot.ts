@@ -10,7 +10,6 @@ import Component from './components/Component';
 
 export interface SchwenzoClient extends Client {
   commands: Collection<string, SchwenzoCommand>;
-  imageBlob: ImageBlob;
   prisma: PrismaClient;
   getComponent<T extends Component>(key: string): T | null;
 }
@@ -25,8 +24,6 @@ export default class SchwenzoBot {
     token: string,
     intents: number[] = [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
   ) {
-    const IMAGE_BLOB_DIR = process.env['IMAGE_BLOB_DIR'] || './images';
-
     this.loading = new Promise((resolve) => {
       this.resolveLoading = resolve;
     });
@@ -42,8 +39,6 @@ export default class SchwenzoBot {
     // Commands Import
     this.client.commands = new Collection();
     this.importCommands();
-    // Initialize Schwenzo Components
-    this.client.imageBlob = new ImageBlob(IMAGE_BLOB_DIR, this.client);
     // Start Bot
     this.client.login(token);
   }

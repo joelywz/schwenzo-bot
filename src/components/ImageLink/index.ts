@@ -3,8 +3,7 @@ import { SchwenzoClient } from '../../SchwenzoBot';
 import { Message } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import Component from '../Component';
-
-const MAX_IMAGE_SIZE = 128;
+import ImageBlob from '../ImageBlob';
 
 class Link {
   private message: string;
@@ -80,12 +79,20 @@ class LinkGuild {
 }
 
 export default class ImageLink extends Component {
+  imageBlob: ImageBlob;
   db: Db;
   linkGuilds: LinkGuild[] = [];
+  maxWidthHeight: number;
 
-  constructor(client: SchwenzoClient) {
+  constructor(
+    client: SchwenzoClient,
+    imageBlob: ImageBlob,
+    maxWidthHeight: number = 128
+  ) {
     super(client);
+    this.imageBlob = imageBlob;
     this.db = new Db(client.prisma);
+    this.maxWidthHeight = maxWidthHeight;
   }
 
   async onReady() {
@@ -121,15 +128,16 @@ export default class ImageLink extends Component {
       const width = image.getWidth();
       const height = image.getHeight();
 
-      if (width <= MAX_IMAGE_SIZE && height <= MAX_IMAGE_SIZE) break imageMod;
+      if (width <= this.maxWidthHeight && height <= this.maxWidthHeight)
+        break imageMod;
       if (width > height) {
-        const ratio = MAX_IMAGE_SIZE / width;
+        const ratio = this.maxWidthHeight / width;
         image.resize(width * ratio, height * ratio);
       } else if (height > width) {
-        const ratio = MAX_IMAGE_SIZE / height;
+        const ratio = this.maxWidthHeight / height;
         image.resize(width * ratio, height * ratio);
       } else {
-        image.resize(MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
+        image.resize(this.maxWidthHeight, this.maxWidthHeight);
       }
     } catch (e) {
       throw new Error('Bad url.');
@@ -137,7 +145,7 @@ export default class ImageLink extends Component {
 
     const buffer = await image.getBufferAsync(MIME_PNG);
 
-    const fileName = await this.client.imageBlob.save(buffer, 'png');
+    const fileName = await this.imageBlob.save(buffer, 'png');
     linkGuild.add(message, fileName);
 
     // Save to database
@@ -153,7 +161,7 @@ export default class ImageLink extends Component {
     // Remove references to the image
     linkGuild.remove(message);
     // Remove file
-    this.client.imageBlob.delete(imageName);
+    this.imageBlob.delete(imageName);
 
     // Remove from database
     await this.db.delete(guildId, message);
@@ -168,7 +176,7 @@ export default class ImageLink extends Component {
 
     try {
       const imageName = linkGuild.getImageName(message.content);
-      const filePath = this.client.imageBlob.retrieveByName(imageName);
+      const filePath = this.imageBlob.retrieveByName(imageName);
       message.reply({
         files: [filePath],
       });

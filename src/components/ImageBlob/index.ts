@@ -1,13 +1,11 @@
-import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { SchwenzoClient } from '../../SchwenzoBot';
 import path from 'path';
 
 export default class ImageBlob {
   baseDir: string;
 
-  constructor(baseDir: string, client: SchwenzoClient) {
+  constructor(baseDir: string) {
     this.baseDir = baseDir;
   }
 
