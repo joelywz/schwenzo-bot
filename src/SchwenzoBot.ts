@@ -8,17 +8,21 @@ import SchwenzoError from './utils/SchwenzoError';
 import { PrismaClient } from '.prisma/client';
 import ImageLink from './components/ImageLink';
 import ImageBlob from './components/ImageBlob';
+import Component from './components/Component';
 
 export interface SchwenzoClient extends Client {
   commands: Collection<string, SchwenzoCommand>;
-  marketMonitor: MarketMonitor;
   imageLink: ImageLink;
   imageBlob: ImageBlob;
   prisma: PrismaClient;
+  getComponent: (key: string) => Component | null | undefined;
 }
 
 export default class SchwenzoBot {
   client: SchwenzoClient;
+  private components: { [key: string]: Component } = {};
+  private loading: Promise<void>;
+  private resolveLoading: (() => void) | null = null;
 
   constructor(
     token: string,
@@ -26,10 +30,14 @@ export default class SchwenzoBot {
   ) {
     const IMAGE_BLOB_DIR = process.env['IMAGE_BLOB_DIR'] || './images';
 
+    this.loading = new Promise((resolve) => {
+      this.resolveLoading = resolve;
+    });
     this.client = new Client({ intents }) as SchwenzoClient;
     // Init database
     this.client.prisma = new PrismaClient();
     // Bind client event to class functions
+    this.client.getComponent = this.getComponent.bind(this);
     this.client.once('ready', this.onReady.bind(this));
     this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
     this.client.on('messageCreate', this.onMessageCreate.bind(this));
@@ -37,8 +45,7 @@ export default class SchwenzoBot {
     // Commands Import
     this.client.commands = new Collection();
     this.importCommands();
-    // Initialize schwenzo cores
-    this.client.marketMonitor = new MarketMonitor(this.client);
+    // Initialize Schwenzo Components
     this.client.imageBlob = new ImageBlob(IMAGE_BLOB_DIR, this.client);
     this.client.imageLink = new ImageLink(this.client);
     // Start Bot
@@ -47,7 +54,7 @@ export default class SchwenzoBot {
 
   private async onReady() {
     console.info('Schwenzo Bot is ready!');
-    this.client.marketMonitor.loadFromDb();
+    if (this.resolveLoading) this.resolveLoading();
     this.client.imageLink.loadFromDb();
   }
 
@@ -85,6 +92,16 @@ export default class SchwenzoBot {
 
   private onError(error: Error) {
     console.error(`Client Error! ${error}`);
+  }
+
+  async addComponent(key: string, component: Component) {
+    this.components[key] = component;
+    await this.loading;
+    await component.onReady();
+  }
+
+  getComponent(key: string): Component | undefined | null {
+    return this.components[key];
   }
 
   private async importCommands() {

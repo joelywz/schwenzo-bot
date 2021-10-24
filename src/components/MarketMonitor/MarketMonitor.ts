@@ -4,6 +4,7 @@ import Binance from 'node-binance-api';
 import { SchwenzoClient } from '../../SchwenzoBot';
 import { marketDoesExist } from '../../utils/binance-api';
 import SchwenzoError from '../../utils/SchwenzoError';
+import Component from '../Component';
 import LivePrice from './LivePrice';
 
 export enum MarketMonitorError {
@@ -17,15 +18,14 @@ interface MarketMonitorMessage extends Message {
   watchList: LivePrice[];
 }
 
-export default class MarketMonitor {
-  client: SchwenzoClient;
+export default class MarketMonitor extends Component {
   private db: Db;
   private livePrices: LivePrice[] = [];
   private binance: Binance;
   private messages: MarketMonitorMessage[] = [];
 
   constructor(client: SchwenzoClient) {
-    this.client = client;
+    super(client);
     this.db = new Db(this.client.prisma);
     this.binance = new Binance({
       log: () => null,
@@ -33,6 +33,10 @@ export default class MarketMonitor {
 
     this.updatePrices();
     setInterval(this.updateMessages.bind(this), 5000);
+  }
+
+  async onReady() {
+    await this.loadFromDb();
   }
 
   // DB Manipulations

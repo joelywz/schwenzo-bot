@@ -42,9 +42,10 @@ export default class Ping implements SchwenzoCommand {
 
   async execute(interaction: CommandInteraction) {
     if (!this.marketMonitor) {
-      this.marketMonitor = (interaction.client as SchwenzoClient).marketMonitor;
+      this.marketMonitor = (interaction.client as SchwenzoClient).getComponent(
+        'market-monitor'
+      ) as MarketMonitor;
     }
-
     if (!this.marketMonitor) interaction.reply('An error occured');
 
     const subcommand = interaction.options.getSubcommand(true);
