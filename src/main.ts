@@ -1,3 +1,4 @@
+import ImageLink from './components/ImageLink';
 import MarketMonitor from './components/MarketMonitor/MarketMonitor';
 import SchwenzoBot from './SchwenzoBot';
 
@@ -24,6 +25,10 @@ function development() {
 }
 
 function initBot(token: string) {
+  const IMAGE_BLOB_DIR = process.env['IMAGE_BLOB_DIR'];
+  if (!IMAGE_BLOB_DIR) throw 'IMAGE_BLOB_DIR not found.';
+
   const bot = new SchwenzoBot(token);
   bot.addComponent('market-monitor', new MarketMonitor(bot.client));
+  bot.addComponent('image-link', new ImageLink(bot.client));
 }

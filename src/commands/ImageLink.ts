@@ -2,8 +2,11 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import SchwenzoCommand from '../SchwenzoCommand';
 import { SchwenzoClient } from '../SchwenzoBot';
+import ImageLinkComponent from '../components/ImageLink';
 
-export default class Ping implements SchwenzoCommand {
+export default class ImageLink implements SchwenzoCommand {
+  imageLink: ImageLinkComponent | null = null;
+  client: SchwenzoClient | null = null;
   data = new SlashCommandBuilder()
     .setName('image-link')
     .setDescription('Link a message to an image')
@@ -43,52 +46,61 @@ export default class Ping implements SchwenzoCommand {
 
   async execute(interaction: CommandInteraction) {
     const subcommand = interaction.options.getSubcommand(true);
+    const client = interaction.client as SchwenzoClient;
+    if (!this.imageLink) {
+      this.imageLink = client.getComponent<ImageLinkComponent>('image-link');
+
+      if (!this.imageLink) throw new Error('Internal error.');
+    }
+
+    if (!interaction.guildId) throw new Error('GuildId not found.');
 
     switch (subcommand) {
       case 'add':
-        await this.add(interaction);
+        await this.add(interaction, this.imageLink, interaction.guildId);
         break;
       case 'remove':
-        await this.remove(interaction);
+        await this.remove(interaction, this.imageLink, interaction.guildId);
         break;
       case 'list':
-        await this.list(interaction);
+        await this.list(interaction, this.imageLink, interaction.guildId);
         break;
     }
   }
 
-  async add(interaction: CommandInteraction) {
+  async add(
+    interaction: CommandInteraction,
+    imageLink: ImageLinkComponent,
+    guildId: string
+  ) {
     await interaction.reply(`Linking image...`);
-    const client = interaction.client as SchwenzoClient;
-    if (!client.imageLink) throw new Error();
-    if (!interaction.guildId) throw new Error();
 
     const message = interaction.options.getString('message', true);
     const url = interaction.options.getString('image-url', true);
 
-    await client.imageLink.add(interaction.guildId, message, url);
+    await imageLink.add(guildId, message, url);
     interaction.editReply(`Image linked to "${message}"`);
   }
 
-  async remove(interaction: CommandInteraction) {
+  async remove(
+    interaction: CommandInteraction,
+    imageLink: ImageLinkComponent,
+    guildId: string
+  ) {
     await interaction.reply(`Unlinking image...`);
-    const client = interaction.client as SchwenzoClient;
-    if (!client.imageLink) throw new Error();
-    if (!interaction.guildId) throw new Error();
-
     const message = interaction.options.getString('message', true);
-
-    await client.imageLink.remove(interaction.guildId, message);
+    await imageLink.remove(guildId, message);
     await interaction.editReply(`Image unlinked from "${message}"`);
   }
 
-  async list(interaction: CommandInteraction) {
+  async list(
+    interaction: CommandInteraction,
+    imageLink: ImageLinkComponent,
+    guildId: string
+  ) {
     await interaction.reply(`Listing linked images...`);
-    const client = interaction.client as SchwenzoClient;
-    if (!client.imageLink) throw new Error();
-    if (!interaction.guildId) throw new Error();
 
-    const messages = client.imageLink.getLinkMessages(interaction.guildId);
+    const messages = imageLink.getLinkMessages(guildId);
     const embed = new MessageEmbed().setTitle('Linked Images');
     let description = '';
 

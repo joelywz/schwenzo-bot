@@ -2,6 +2,7 @@ import Jimp, { MIME_PNG } from 'jimp';
 import { SchwenzoClient } from '../../SchwenzoBot';
 import { Message } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
+import Component from '../Component';
 
 const MAX_IMAGE_SIZE = 128;
 
@@ -78,17 +79,20 @@ class LinkGuild {
   }
 }
 
-export default class ImageLink {
-  client: SchwenzoClient;
+export default class ImageLink extends Component {
   db: Db;
   linkGuilds: LinkGuild[] = [];
 
   constructor(client: SchwenzoClient) {
-    this.client = client;
+    super(client);
     this.db = new Db(client.prisma);
   }
 
-  async loadFromDb() {
+  async onReady() {
+    await this.loadFromDb();
+  }
+
+  private async loadFromDb() {
     try {
       const linkedImages = await this.db.getLinks();
 

@@ -10,5 +10,5 @@ export default abstract class Component {
 
   onReady(): void | Promise<void> {}
 
-  onMessage(message: Message): void | Promise<void> {}
+  async onMessage(message: Message): Promise<void> {}
 }

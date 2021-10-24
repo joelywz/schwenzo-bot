@@ -3,19 +3,16 @@ import { Client, Intents, Interaction, Message } from 'discord.js';
 import SchwenzoCommand from './SchwenzoCommand';
 import path from 'path';
 import fs from 'fs';
-import MarketMonitor from './components/MarketMonitor/MarketMonitor';
 import SchwenzoError from './utils/SchwenzoError';
 import { PrismaClient } from '.prisma/client';
-import ImageLink from './components/ImageLink';
 import ImageBlob from './components/ImageBlob';
 import Component from './components/Component';
 
 export interface SchwenzoClient extends Client {
   commands: Collection<string, SchwenzoCommand>;
-  imageLink: ImageLink;
   imageBlob: ImageBlob;
   prisma: PrismaClient;
-  getComponent: (key: string) => Component | null | undefined;
+  getComponent<T extends Component>(key: string): T | null;
 }
 
 export default class SchwenzoBot {
@@ -47,7 +44,6 @@ export default class SchwenzoBot {
     this.importCommands();
     // Initialize Schwenzo Components
     this.client.imageBlob = new ImageBlob(IMAGE_BLOB_DIR, this.client);
-    this.client.imageLink = new ImageLink(this.client);
     // Start Bot
     this.client.login(token);
   }
@@ -55,7 +51,6 @@ export default class SchwenzoBot {
   private async onReady() {
     console.info('Schwenzo Bot is ready!');
     if (this.resolveLoading) this.resolveLoading();
-    this.client.imageLink.loadFromDb();
   }
 
   private async onInteractionCreate(interaction: Interaction) {
@@ -87,7 +82,9 @@ export default class SchwenzoBot {
   }
 
   private async onMessageCreate(message: Message) {
-    this.client.imageLink.onMessage(message);
+    Object.keys(this.components).map(async (key) => {
+      await this.components[key].onMessage(message);
+    });
   }
 
   private onError(error: Error) {
@@ -100,8 +97,11 @@ export default class SchwenzoBot {
     await component.onReady();
   }
 
-  getComponent(key: string): Component | undefined | null {
-    return this.components[key];
+  getComponent<T extends Component>(key: string): T | null {
+    const component = this.components[key];
+    if (!component) return null;
+
+    return component as T;
   }
 
   private async importCommands() {
