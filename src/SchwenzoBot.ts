@@ -1,17 +1,11 @@
 import Collection from '@discordjs/collection';
-import {
-  Client,
-  Intents,
-  Interaction,
-  Message,
-  MessageEmbed,
-} from 'discord.js';
+import { Client, Intents, Interaction, Message } from 'discord.js';
 import SchwenzoCommand from './SchwenzoCommand';
 import path from 'path';
 import fs from 'fs';
 import MarketMonitor from './components/MarketMonitor/MarketMonitor';
 import SchwenzoError from './utils/SchwenzoError';
-import { Prisma, PrismaClient } from '.prisma/client';
+import { PrismaClient } from '.prisma/client';
 import ImageLink from './components/ImageLink';
 import ImageBlob from './components/ImageBlob';
 
