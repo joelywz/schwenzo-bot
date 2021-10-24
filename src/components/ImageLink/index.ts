@@ -119,6 +119,8 @@ export default class ImageLink extends Component {
   async add(guildId: string, message: string, url: string) {
     const linkGuild = this.getLinkGuild(guildId);
     if (linkGuild.hasMaxReached()) throw new Error('Maximum limit reached');
+    if (linkGuild.hasMessage(message))
+      throw new Error('Message has already been linked to an image.');
 
     let image;
 
