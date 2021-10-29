@@ -91,7 +91,11 @@ export default class MarketMonitor extends Component {
           embeds: [this.generateEmbed(message.watchList)],
         });
       } catch (e) {
-        this.unregisterMessage(message.guildId);
+        const err = e as Error;
+        console.error(
+          `Market Monitor: (${err.message}) Message for ${message.guildId} failed to update, attempting to re-register message.`
+        );
+        this.retryMessage(message);
       }
     }
   }
@@ -146,7 +150,7 @@ export default class MarketMonitor extends Component {
     return monitorMessage;
   }
 
-  async unregisterMessage(guildId: string) {
+  async unregisterMessage(guildId: string, save: boolean = true) {
     console.info(
       `Market Monitor: Attempting to unregister a message from Guild ID: ${guildId}`
     );
@@ -167,11 +171,36 @@ export default class MarketMonitor extends Component {
     );
 
     // Update database
-    await this.db.deleteMonitorMessage(guildId);
+    if (save) {
+      await this.db.deleteMonitorMessage(guildId);
+    }
 
     console.info(
       `Market Monitor: Succesfully unregistered a message from Guild ID: ${guildId}`
     );
+  }
+
+  async retryMessage(message: MarketMonitorMessage) {
+    // Remove message from messages
+    const guildId = message.guildId;
+    const channelId = message.channelId;
+    const messageId = message.id;
+
+    if (!guildId) return;
+
+    // Register
+    try {
+      console.info(`Market Monitor: Unregistering Message...`);
+      await this.unregisterMessage(guildId);
+      console.info(`Market Monitor: Re-registering Message...`);
+      await this.registerMessage(guildId, channelId, messageId);
+    } catch (e) {
+      const error = e as Error;
+      if (error.message)
+        console.error(
+          `Market Monitor: (${error.message}) Removed from database.`
+        );
+    }
   }
 
   async watch(guildId: string, symbol: string, save: boolean = true) {
