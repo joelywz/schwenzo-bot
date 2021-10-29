@@ -95,7 +95,7 @@ export default class MarketMonitor extends Component {
         console.error(
           `Market Monitor: (${err.message}) Message for ${message.guildId} failed to update, attempting to re-register message.`
         );
-        this.retryMessage(message);
+        await this.retryMessage(message);
       }
     }
   }
