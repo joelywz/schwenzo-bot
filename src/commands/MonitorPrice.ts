@@ -78,7 +78,7 @@ export default class Ping implements SchwenzoCommand {
 
     // Success reply
     await interaction.reply({
-      content: `Successfully added ${symbol}/USDT to monitor list.`,
+      content: `Successfully added ${symbol.toUpperCase()}/USDT to monitor list.`,
       ephemeral: true,
     });
   }
